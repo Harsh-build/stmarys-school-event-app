@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "571130772397",
+    "project_id": "st-marys-school-app",
+    "storage_bucket": "st-marys-school-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571130772397:android:4dfc3f7d70f593c840bf24",
+        "android_client_info": {
+          "package_name": "com.stmarysschool.gursarai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571130772397-nm804vbi7831dh6usta5iua1blruo34h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbws97h8OUUZ2pIlCTNU0QkuDhzFQZddM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571130772397-nm804vbi7831dh6usta5iua1blruo34h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

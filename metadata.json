@@ -1,0 +1,6 @@
+{
+  "name": "St Marys Gursarai",
+  "description": "Mary's Connect - Official School Event Management & Student Activity Application for St. Mary's Sr. Sec. School, Gursarai",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
