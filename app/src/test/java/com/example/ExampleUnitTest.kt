@@ -81,4 +81,36 @@ class ExampleUnitTest {
         assertNotNull(att)
         assertEquals(AttendanceStatus.PRESENT, att!!.attendanceStatus)
     }
+
+    @Test
+    fun `test create new account through email`() = runBlocking {
+        val repo = MarysRepository()
+
+        val result = repo.createAccountWithEmail(
+            fullName = "Harsh Patel",
+            emailInput = "harsh.patel@stmarys.edu",
+            passwordInput = "secret123",
+            className = "11th",
+            section = "C",
+            studentId = "SMSG-2026-9901"
+        )
+
+        assertTrue(result.isSuccess)
+        val profile = result.getOrNull()
+        assertNotNull(profile)
+        assertEquals("Harsh Patel", profile?.fullName)
+        assertEquals("harsh.patel@stmarys.edu", profile?.email)
+        assertEquals(UserRole.STUDENT, profile?.role)
+        assertEquals("11th", profile?.className)
+        assertEquals("C", profile?.section)
+        assertEquals(profile?.uid, repo.currentUser.value?.uid)
+
+        // Verify that they can log out and log back in seamlessly with their registered email
+        repo.logout()
+        assertEquals(null, repo.currentUser.value)
+
+        val reLogin = repo.signInWithEmailPassword("harsh.patel@stmarys.edu", "secret123")
+        assertTrue(reLogin.isSuccess)
+        assertEquals("Harsh Patel", reLogin.getOrNull()?.fullName)
+    }
 }

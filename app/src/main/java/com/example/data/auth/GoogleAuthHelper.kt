@@ -52,11 +52,21 @@ object GoogleAuthHelper {
                 Result.failure(Exception("Unexpected credential format received."))
             }
         } catch (e: GetCredentialCancellationException) {
-            Log.w(TAG, "User cancelled Google Sign-In: ${e.message}")
-            Result.failure(e)
+            Log.w(TAG, "User cancelled or Google Sign-In reauth failed: ${e.message}")
+            val msg = e.message ?: ""
+            if (msg.contains("16") || msg.contains("reauth", ignoreCase = true) || msg.contains("DEVELOPER_ERROR", ignoreCase = true)) {
+                Result.failure(Exception("Google Sign-In requires your app's SHA-1 fingerprint registered in Firebase Console (Project Settings > Android app). Alternatively, sign in using your school email & password above."))
+            } else {
+                Result.failure(Exception("Google Sign-In was cancelled."))
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Google Sign-In failed", e)
-            Result.failure(e)
+            val msg = e.message ?: ""
+            if (msg.contains("16") || msg.contains("reauth", ignoreCase = true) || msg.contains("DEVELOPER_ERROR", ignoreCase = true)) {
+                Result.failure(Exception("Google Sign-In requires your app's SHA-1 fingerprint registered in Firebase Console (Project Settings > Android app). Alternatively, sign in using your school email & password above."))
+            } else {
+                Result.failure(e)
+            }
         }
     }
 }

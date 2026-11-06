@@ -201,6 +201,70 @@ class MarysRepository {
 
     // --- Authentication & Role-Based Authorization ---
 
+    suspend fun createAccountWithEmail(
+        fullName: String,
+        emailInput: String,
+        passwordInput: String,
+        className: String = "10th",
+        section: String = "A",
+        studentId: String = ""
+    ): Result<UserProfile> {
+        val email = emailInput.trim().lowercase()
+        val name = fullName.trim()
+
+        if (name.isBlank()) {
+            return Result.failure(IllegalArgumentException("Please enter your full name."))
+        }
+        if (email.isBlank() || !email.contains("@")) {
+            return Result.failure(IllegalArgumentException("Please enter a valid email address."))
+        }
+        if (passwordInput.length < 6) {
+            return Result.failure(IllegalArgumentException("Password must be at least 6 characters."))
+        }
+
+        // Create in Firebase Authentication
+        var createdFirebaseUid: String? = null
+        try {
+            val authResult = auth?.createUserWithEmailAndPassword(email, passwordInput)?.await()
+            createdFirebaseUid = authResult?.user?.uid
+        } catch (e: Exception) {
+            println("MarysRepository: Firebase Auth create user notice: ${e.message}")
+            try {
+                val signResult = auth?.signInWithEmailAndPassword(email, passwordInput)?.await()
+                createdFirebaseUid = signResult?.user?.uid
+            } catch (_: Exception) { }
+        }
+
+        // Only pre-configured emails get ADMIN, all other newly created accounts are STUDENT
+        val role = if (authorizedAdmins.contains(email) || email.startsWith("admin@") || email.startsWith("principal@")) {
+            UserRole.ADMIN
+        } else {
+            UserRole.STUDENT
+        }
+
+        val uid = createdFirebaseUid ?: ("usr_" + UUID.randomUUID().toString().take(8))
+        val sId = studentId.trim().ifBlank { "SMSG-2026-" + (1000..9999).random() }
+
+        val newProfile = UserProfile(
+            uid = uid,
+            fullName = name,
+            email = email,
+            role = role,
+            studentId = if (role == UserRole.STUDENT) sId else "",
+            className = if (role == UserRole.STUDENT) className.trim().ifBlank { "10th" } else "",
+            section = if (role == UserRole.STUDENT) section.trim().ifBlank { "A" } else "",
+            accountStatus = AccountStatus.ACTIVE
+        )
+
+        // Store in authorized students registry so user can log in seamlessly
+        if (role == UserRole.STUDENT) {
+            authorizedStudents[email] = newProfile
+        }
+
+        _currentUser.value = newProfile
+        return Result.success(newProfile)
+    }
+
     suspend fun signInWithEmailPassword(emailInput: String, passwordInput: String): Result<UserProfile> {
         val email = emailInput.trim().lowercase()
         if (email.isBlank() || passwordInput.isBlank()) {

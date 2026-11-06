@@ -90,6 +90,35 @@ class MainViewModel(
 
     // --- Authentication ---
 
+    fun createAccountWithEmail(
+        fullName: String,
+        email: String,
+        password: String,
+        className: String,
+        section: String,
+        studentId: String,
+        onSuccess: (UserProfile) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = repository.createAccountWithEmail(
+                fullName = fullName,
+                emailInput = email,
+                passwordInput = password,
+                className = className,
+                section = section,
+                studentId = studentId
+            )
+            result.onSuccess { profile ->
+                onSuccess(profile)
+                val roleName = if (profile.role == UserRole.ADMIN) "Administrator" else "Student"
+                showSnackbar("Account created! Welcome, ${profile.fullName} ($roleName)")
+            }.onFailure { exception ->
+                onError(exception.localizedMessage ?: "Failed to create account.")
+            }
+        }
+    }
+
     fun signInWithEmailPassword(
         email: String,
         password: String,

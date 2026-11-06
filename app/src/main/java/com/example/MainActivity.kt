@@ -65,6 +65,9 @@ fun MarysConnectSimpleApp(viewModel: MainViewModel) {
                     onSignInWithEmail = { email, password, onSuccess, onError ->
                         viewModel.signInWithEmailPassword(email, password, onSuccess, onError)
                     },
+                    onCreateAccountWithEmail = { fullName, email, password, className, section, studentId, onSuccess, onError ->
+                        viewModel.createAccountWithEmail(fullName, email, password, className, section, studentId, onSuccess, onError)
+                    },
                     onGoogleSignInSuccess = { firebaseUser ->
                         viewModel.handleGoogleSignInSuccess(
                             firebaseUser = firebaseUser,
